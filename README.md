@@ -2,9 +2,15 @@
 
 ## Latest Release - [21.11.01](https://github.com/baykovr/AVPI/releases/tag/21.11.01)
 
-[Direct Download - GAVPI_21.11.01.zip](https://github.com/baykovr/AVPI/releases/download/21.11.01/GAVPI_21.11.01.zip)
+[Direct Download (baykovr's repo) - GAVPI_21.11.01.zip](https://github.com/baykovr/AVPI/releases/download/21.11.01/GAVPI_21.11.01.zip)
 
 _You should run gavpi as administrator for it work properly in most games. (right click run as...)_
+
+## This is a fork
+
+See the upstream at (baykovr/AVPI)[https://github.com/baykovr/AVPI]
+
+The main change here is an attempt to recognize more than one trigger phrase in sequence, to eliminate the need to pause between uttering the phrases.
 
 ### About
 
