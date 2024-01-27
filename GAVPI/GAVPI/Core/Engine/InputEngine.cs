@@ -65,17 +65,10 @@ namespace GAVPI
             // Grammer must match speech recognition language localization
             phrases_grammar.Culture = GAVPI.Settings.recognizer_info;
 
-            List<string> glossory = new List<string>();
-            
-            // Add trigger phrases to glossory of voice recognition engine.
-            foreach (Phrase trigger in GAVPI.Profile.Profile_Triggers)
-            {
-                glossory.Add(trigger.value);
-            }
-
-
+            var glossory = from trigger in GAVPI.Profile.Profile_Triggers select trigger.value;
             phrases_grammar.Append(new Choices(glossory.ToArray()));
-			speech_re.LoadGrammar(new Grammar(phrases_grammar));
+            GrammarBuilder repeated_phrases = new GrammarBuilder(phrases_grammar, 1, 90);
+			speech_re.LoadGrammar(new Grammar(repeated_phrases));
 
 			// event function hook
 			speech_re.SpeechRecognized          += phraseRecognized;
@@ -138,24 +131,20 @@ namespace GAVPI
         {
             if (pushtotalk_active)
             {
-                string recognized_value = e.Result.Text;
-
                 if (!GAVPI.Profile.IsAssociatedProcessFocused())
                     return;
 
-                GAVPI.Profile.Profile_Triggers.Find(trigger => trigger.value == recognized_value).run();
-                
-                //equivilent code below for reference.
-                //foreach (VI_Phrase phrase in profile.Profile_Triggers)
-                //{
-                //    if (phrase.value == recognized_value)
-                //    {
-                //        phrase.run(); // Fire events
-                //    }
-                //}
+                // TODO: a recognized phrase can be broken into multiple elements in .Words,
+                //       which will cause us not to be able to find the commands.  One mitigation
+                //       is to avoid whitespace in the trigger values by using hyphens instead.
+                foreach (RecognizedWordUnit word in e.Result.Words)
+                {
+                    string recognized_value = word.Text;
+                    GAVPI.Profile.Profile_Triggers.Find(trigger => trigger.value == recognized_value).run();
+                }
 
                 // Update the log after the action is run, since UpdateStatus is a blocking method.
-                UpdateStatusLog(recognized_value.ToString());
+                UpdateStatusLog(e.Result.Text);
                 if (GAVPI.Settings.pushtotalk_mode == "Single")
                 {
                     pushtotalk_active = false;
